@@ -3,6 +3,19 @@ body {
   margin: 20px;
 }
 
+.apptitle {
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+}
+
+table, td, th {
+  border: 1px solid #ccc;
+}
+
+
 /* the flex stuff to do list reordering comes from:
  * https://stackoverflow.com/questions/25695000/how-to-display-a-reverse-ordered-list-in-html
  */
@@ -19,6 +32,8 @@ ol.reversed {
 li {
   flex: 0 0 auto;
 }
+
+
 
 .selectedMove {
   font-weight: bold;

@@ -19,7 +19,14 @@ class TaskList extends React.Component {
 class Task extends React.Component {
   render() {
     // TODO: render the text in a nice table row, also with edit/update or delete buttons
-    return (<div>Task [{this.props.content}] from date {this.props.date_created}</div>);
+    return (
+      <tr>
+        <td>{this.props.date_created}</td>
+        <td>{this.props.content}</td>
+        <td>Future Actions...
+          <button onClick={this.props.onDeleteClick}>Delete Task</button>
+        </td>
+      </tr>);
   } 
 }
 
@@ -33,6 +40,7 @@ class TaskApp extends React.Component {
     };
   }
 
+
   render() {
 
     let recent_status = "What just happened...";
@@ -42,17 +50,27 @@ class TaskApp extends React.Component {
       tasklist.push(<Task
         content={this.state.tasks[i].content}
         date_created={this.state.tasks[i].date_created}
+        onDeleteClick={() => this.deleteTask(i) /* TODO use actual id */}
         />);
     }
 
     return (
       <div>
-        <em>TaskApp Component</em><br/>
-        Status: {recent_status}
+        <h1 class="apptitle">Task App</h1>
+        <div class="subtitle">Status: {recent_status}</div>
         <hr/>
         
-        {/* TODO: insert a table around this */}
-        {tasklist}
+        <table>
+          <tr>
+            <th>Date Created</th>
+            <th>Contents</th>
+            <th>Actions</th>
+          </tr>
+          {tasklist}
+
+
+        </table>
+  
         
         <div className="tasklistfooter">
           Top of Footer Text
@@ -72,17 +90,23 @@ class TaskApp extends React.Component {
     this.createNewTask(text);
   }
 
+
+  // TODO implement me, first with state, then with the DB.
+  // read all tasks TODO()
+  // update task (text, id)
+  // delete task (id)
   createNewTask(text) {
     this.setState({
       tasks: this.state.tasks.concat([{content: text, date_created: "2020-01-01"}])
     });
   }
+
+  deleteTask(id) {
+    // TODO: do an actual delete.
+    alert("In deleteTask with id=" + id);
+  }
 }
 
-// TODO implement me, first with state, then with the DB.
-// read all tasks TODO()
-// update task (text, id)
-// delete task (id)
 
 
 function Square(props) {
