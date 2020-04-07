@@ -3,19 +3,6 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 
-
-
-class TaskList extends React.Component {
-  render() {
-    let tasks = []
-    return (<div>TaskList<hr/>{tasks}</div>);
-    //return(
-    //  <div className="tasklist">
-    //  { /* insert repeated array of Task objects here */ }
-    //</div>
-  }
-}
-
 class Task extends React.Component {
   render() {
     // TODO: render the text in a nice table row, also with edit/update or delete buttons
@@ -35,8 +22,9 @@ class TaskApp extends React.Component {
     super(props);
     this.state = {
       tasks: [
-      {content: "Item #1", date_created: "2020-01-01"},
-      {content: "Item #2", date_created: "2020-01-01"}]
+      {id:0, content: "Item #1", date_created: "2020-01-01"},
+      {id: 1, content: "Item #2", date_created: "2020-01-01"}],
+      nextid: 2
     };
   }
 
@@ -47,27 +35,33 @@ class TaskApp extends React.Component {
 
     let tasklist = [];
     for (let i = 0; i < this.state.tasks.length; ++i) {
+      console.log("Pushing task: id=" + this.state.tasks[i].id
+        + ". content=" + this.state.tasks[i].content);
       tasklist.push(<Task
+        key={i}
         content={this.state.tasks[i].content}
         date_created={this.state.tasks[i].date_created}
-        onDeleteClick={() => this.deleteTask(i) /* TODO use actual id */}
+        onDeleteClick={() => {this.deleteTask(this.state.tasks[i].id);}}
         />);
     }
 
     return (
       <div>
-        <h1 class="apptitle">Task App</h1>
-        <div class="subtitle">Status: {recent_status}</div>
+        <h1 className="apptitle">Task App</h1>
+        <div className="subtitle">Status: {recent_status}</div>
         <hr/>
         
         <table>
-          <tr>
-            <th>Date Created</th>
-            <th>Contents</th>
-            <th>Actions</th>
-          </tr>
-          {tasklist}
-
+          <thead>
+            <tr>
+              <th>Date Created</th>
+              <th>Contents</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasklist}
+          </tbody>
 
         </table>
   
@@ -85,8 +79,6 @@ class TaskApp extends React.Component {
 
   handleAddTaskButtonClick() {
     const text = document.getElementById("addTaskContents").value.trim();
-    alert("Adding new task with contents [" + text + "]");
-    // strip the text.
     this.createNewTask(text);
   }
 
@@ -96,19 +88,33 @@ class TaskApp extends React.Component {
   // update task (text, id)
   // delete task (id)
   createNewTask(text) {
+    console.log("createNewTask text=" + text
+      + " using ID:" + this.state.nextid);
     this.setState({
-      tasks: this.state.tasks.concat([{content: text, date_created: "2020-01-01"}])
+      tasks: this.state.tasks.concat(
+        [{id: this.state.nextid,
+          content: text,
+          date_created: "2020-01-01"}]),
+      nextid: this.state.nextid + 1
     });
   }
 
   deleteTask(id) {
     // TODO: do an actual delete.
-    alert("In deleteTask with id=" + id);
+    // Filter the TODO lists.
+    // TODO TODO TODO START HERE... Add an ID element here...
+    console.log("In deleteTask with id=" + id);
+    let newtasks = this.state.tasks.filter((t) => {return t.id !== id});
+    this.setState({
+      tasks: newtasks,
+      nextid: this.state.nextid
+    });
   }
 }
 
 
 
+/*
 function Square(props) {
   const classes = props.isWinningSquare ? "square winningsquare" : "square";
   return (
@@ -118,8 +124,9 @@ function Square(props) {
     {props.value}
     </button>
     );
-}
+}*/
 
+/*
 class Board extends React.Component {
   renderSquare(i, isWinningSquare) {
     return (
@@ -147,9 +154,9 @@ class Board extends React.Component {
     }
     return (<div>{board}</div>);
   }
-}
+}*/
 
-
+/*
 class Game extends React.Component {
   constructor(props) {
     super(props);
@@ -218,7 +225,6 @@ class Game extends React.Component {
               Ascending Move Order
             </label>
           </div>
-        {/* add the class 'reversed' to this element to reverse the list */}
           <ol id="orderedListOfMoves">{moves}</ol>
         </div>
       </div>
@@ -261,9 +267,11 @@ class Game extends React.Component {
     });
   }
 }
+*/
 
   /* given a current board, and the previous board, return a string
    * describing the most recent move.*/
+  /*
   function computeLastMove(cur, prev) {
     //let tmp = 0;
     let row = null, col = null;
@@ -277,12 +285,12 @@ class Game extends React.Component {
       }
     });
     return played + " played on row " + (row+1) + ", col " + (col+1);
-  }
+  }*/
 
 // returns a tuple. first element is player that won: 'X' or 'O'
 // second element is a 3 element array of squares they occupied to win.
 // if no winner, we return null.
-function calculateWinner(squares) {
+/*function calculateWinner(squares) {
   const lines = [
     [0, 1, 2],
     [3, 4, 5],
@@ -302,14 +310,13 @@ function calculateWinner(squares) {
     }
   }
   return null;
-}
+}*/
 
 
 
 // ========================================
 
 ReactDOM.render(
-  //  <Game />,
   <TaskApp/>,
   document.getElementById('root')
 );
