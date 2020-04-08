@@ -113,24 +113,6 @@ class TaskApp extends React.Component {
     this.createNewTask(text);
   }
 
-
-  // TODO implement me, first with state, then with the DB.
-  // read all tasks TODO()
-  createNewTask(text) {
-    console.log("createNewTask text=" + text
-      + " using ID:" + this.state.nextId);
-    // TODO: call deepCopy
-    this.setState({
-      tasks: this.state.tasks.concat(
-        [{id: this.state.nextId,
-          content: text,
-          date_created: "2020-01-01"}]),
-      nextId: this.state.nextId + 1,
-      editing: this.state.editing
-    });
-  }
-
-
   deepCopyState(s) {
     let newTasks = [];
     for (let i = 0; i < s.tasks.length; ++i) {
@@ -143,6 +125,22 @@ class TaskApp extends React.Component {
     }
     return newState
   }
+
+  // TODO implement me, first with state, then with the DB.
+  // read all tasks TODO()
+  createNewTask(text) {
+    console.log("createNewTask text=" + text
+      + " using ID:" + this.state.nextId);
+
+    let newState = this.deepCopyState(this.state);
+    newState.tasks.push({
+        id: this.state.nextId,
+            content: text,
+            date_created: "2020-01-01"});
+    newState.nextId++;
+    this.setState(newState);
+  }
+
 
   saveEditedTask(id) {
     const newContent =
@@ -167,7 +165,6 @@ class TaskApp extends React.Component {
     this.setState(newState);
   }
 
-  /* TODO TODO TODO DO THIS NEXT */
   setTaskToEditingMode(id) {
     console.log("in setTaskToEditingMode with id=" + id);
     let newState = this.deepCopyState(this.state);
@@ -175,17 +172,11 @@ class TaskApp extends React.Component {
     this.setState(newState);
   }
 
-  // TODO: replace this with a call to deepcopy then modify.
-  // TODO: do same for other calls to setState
   deleteTask(id) {
-    // TODO: call deepcopy here
     console.log("In deleteTask with id=" + id);
-    let newtasks = this.state.tasks.filter((t) => {return t.id !== id});
-    this.setState({
-      tasks: newtasks,
-      nextId: this.state.nextId,
-      editing: this.state.editing
-    });
+    let newState = this.deepCopyState(this.state)
+    newState.tasks = this.state.tasks.filter((t) => {return t.id !== id});
+    this.setState(newState);
   }
 }
 
