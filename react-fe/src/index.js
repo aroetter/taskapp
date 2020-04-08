@@ -3,16 +3,40 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 
+function getInputHTMLElementIdByTaskId(id) {
+  return "editTaskTextBox_" + id;
+}
+
 class Task extends React.Component {
   render() {
-    // TODO: render the text in a nice table row, also with edit/update or delete buttons
+
+    let content, buttons
+    if (this.props.isEditing) {
+      // In editing mode, show the content as a text box
+      // And give "Save" and "Cancel" buttons
+      content = <input
+        id={getInputHTMLElementIdByTaskId(this.props.id)}
+        defaultValue={this.props.content}
+      />
+      buttons = <>
+          <button onClick={this.props.onSaveButtonClick}>Save</button>
+          <button onClick={this.props.onCancelButtonClick}>Cancel</button>
+          </>
+    } else {
+      // In read mode, content is static text
+      // Give "Edit" and "Delete" buttons
+      content = this.props.content;
+      buttons = <>
+          <button onClick={this.props.onEditButtonClick}>Edit</button>
+          <button onClick={this.props.onDeleteButtonClick}>Delete</button>
+          </>
+    }
+
     return (
       <tr>
         <td>{this.props.date_created}</td>
-        <td>{this.props.content}</td>
-        <td>Future Actions...
-          <button onClick={this.props.onDeleteClick}>Delete Task</button>
-        </td>
+        <td>{content}</td>
+        <td>Actions: {buttons}</td>
       </tr>);
   } 
 }
@@ -23,25 +47,32 @@ class TaskApp extends React.Component {
     this.state = {
       tasks: [
       {id:0, content: "Item #1", date_created: "2020-01-01"},
-      {id: 1, content: "Item #2", date_created: "2020-01-01"}],
-      nextid: 2
+      {id: 1, content: "Item #2", date_created: "2020-02-02"}],
+      nextId: 2,
+      editing: new Set()
     };
+    this.state.editing.add(1);
   }
 
 
   render() {
 
-    let recent_status = "What just happened...";
+    let recent_status = "TODO What just happened...";
 
     let tasklist = [];
     for (let i = 0; i < this.state.tasks.length; ++i) {
       console.log("Pushing task: id=" + this.state.tasks[i].id
         + ". content=" + this.state.tasks[i].content);
       tasklist.push(<Task
-        key={i}
+        key={this.state.tasks[i].id}
+        id={this.state.tasks[i].id}
         content={this.state.tasks[i].content}
         date_created={this.state.tasks[i].date_created}
-        onDeleteClick={() => {this.deleteTask(this.state.tasks[i].id);}}
+        onSaveButtonClick={() => {this.saveEditedTask(this.state.tasks[i].id);}}
+        onCancelButtonClick={() => {this.cancelEditForTask(this.state.tasks[i].id);}}
+        onEditButtonClick={() => {this.setTaskToEditingMode(this.state.tasks[i].id);}}
+        onDeleteButtonClick={() => {this.deleteTask(this.state.tasks[i].id);}}
+        isEditing={this.state.editing.has(this.state.tasks[i].id)}
         />);
     }
 
@@ -85,20 +116,66 @@ class TaskApp extends React.Component {
 
   // TODO implement me, first with state, then with the DB.
   // read all tasks TODO()
-  // update task (text, id)
-  // delete task (id)
   createNewTask(text) {
     console.log("createNewTask text=" + text
-      + " using ID:" + this.state.nextid);
+      + " using ID:" + this.state.nextId);
     this.setState({
       tasks: this.state.tasks.concat(
-        [{id: this.state.nextid,
+        [{id: this.state.nextId,
           content: text,
           date_created: "2020-01-01"}]),
-      nextid: this.state.nextid + 1
+      nextId: this.state.nextId + 1,
+      editing: this.state.editing
     });
   }
 
+
+  deepCopyState(s) {
+    let newTasks = [];
+    for (let i = 0; i < s.tasks.length; ++i) {
+      newTasks.push(Object.assign({}, s.tasks[i]));
+    }
+    let newState = {
+      tasks: newTasks,
+      nextId: s.nextId,
+      editing: new Set(s.editing)
+    }
+    return newState
+  }
+
+  saveEditedTask(id) {
+    const newContent =
+      document.getElementById(getInputHTMLElementIdByTaskId(id));
+
+    let newState = this.deepCopyState(this.state);
+
+    for(let i = 0; i < newState.tasks.length; ++i) {
+      if (newState.tasks[i].id === id) {
+        newState.tasks[i].content = newContent.value;
+      }
+    }
+    // now save, aka remove this id from the 'editing' state
+    newState.editing.delete(id);
+    this.setState(newState);
+  }
+
+  cancelEditForTask(id) {
+    console.log("in cancelEditForTask with id=" + id);
+    let newState = this.deepCopyState(this.state);
+    newState.editing.delete(id);
+    this.setState(newState);
+  }
+
+  /* TODO TODO TODO DO THIS NEXT */
+  setTaskToEditingMode(id) {
+    console.log("in setTaskToEditingMode with id=" + id);
+    let newState = this.deepCopyState(this.state);
+    newState.editing.add(id);
+    this.setState(newState);
+  }
+
+  // TODO: replace this with a call to deepcopy then modify.
+  // TODO: do same for other calls to setState
   deleteTask(id) {
     // TODO: do an actual delete.
     // Filter the TODO lists.
@@ -107,7 +184,8 @@ class TaskApp extends React.Component {
     let newtasks = this.state.tasks.filter((t) => {return t.id !== id});
     this.setState({
       tasks: newtasks,
-      nextid: this.state.nextid
+      nextId: this.state.nextId,
+      editing: this.state.editing
     });
   }
 }
