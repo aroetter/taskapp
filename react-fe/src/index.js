@@ -9,7 +9,6 @@ function getInputHTMLElementIdByTaskId(id) {
 
 class Task extends React.Component {
   render() {
-
     let content, buttons
     if (this.props.isEditing) {
       // In editing mode, show the content as a text box
@@ -44,6 +43,7 @@ class Task extends React.Component {
 class TaskApp extends React.Component {
   constructor(props) {
     super(props);
+    // TODO: initial dummy state, remove
     this.state = {
       tasks: [
       {id:0, content: "Item #1", date_created: "2020-01-01"},
@@ -57,7 +57,7 @@ class TaskApp extends React.Component {
 
   render() {
 
-    let recent_status = "TODO What just happened...";
+    let recent_status = "TODO: Set status to most recent action...";
 
     let tasklist = [];
     for (let i = 0; i < this.state.tasks.length; ++i) {
