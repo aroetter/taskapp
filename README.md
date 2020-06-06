@@ -4,5 +4,6 @@
 ```
 $ npx create-react-app react-fe
 $ cd react-fe
+# npm install axios
 $ rm -rf src/*
 ```

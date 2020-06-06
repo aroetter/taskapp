@@ -44,19 +44,52 @@ class TaskApp extends React.Component {
   constructor(props) {
     super(props);
     // TODO: initial dummy state, remove
+    // set to empty here, then validate that loadStateFromAPI() is called
+    // on inital page load.
     this.state = {
       tasks: [
       {id:0, content: "Item #1", date_created: "2020-01-01"},
       {id: 1, content: "Item #2", date_created: "2020-02-02"}],
+      // TODO: delete nextId. entirely get from DB.
       nextId: 2,
       editing: new Set()
     };
     this.state.editing.add(1);
   }
 
+  componentDidMount() {
+    console.log("In componentDidMount");
+    this.loadStateFromAPI();
+  }  
+
+  loadStateFromAPI() {
+    console.log("n loadStateFromAPI();");
+    fetch("http://localhost:5001/task/api/v1/resources/tasks/all")
+        .then(res => res.json())
+        .then((data) => {
+          // munge the resulting data into our state structure.
+          let nextFreeId = -1;
+          for(let i = 0; i < data.length; ++i) {
+            if (data[i].id > nextFreeId) {
+              nextFreeId = data[i].id;
+            }
+          }
+          // TODO: get rid of nextFreeId().
+          // TODO: if we have a Set() of being edited tasks, copy that here.
+          nextFreeId++;
+
+          console.log("Using nextFreeId = " + nextFreeId);
+          let state = {
+            tasks: data,
+            nextId: nextFreeId,
+            editing: new Set()
+          };
+          this.setState(state)
+        })
+        .catch(console.log);
+  }
 
   render() {
-
     let recent_status = "TODO: Set status to most recent action...";
 
     let tasklist = [];
@@ -129,6 +162,7 @@ class TaskApp extends React.Component {
   // TODO implement me, first with state, then with the DB.
   // read all tasks TODO()
   createNewTask(text) {
+    // TODO: make an API call, then refresh the state from API
     console.log("createNewTask text=" + text
       + " using ID:" + this.state.nextId);
 
@@ -143,6 +177,9 @@ class TaskApp extends React.Component {
 
 
   saveEditedTask(id) {
+    // TODO: make an API call to save this task
+    // TODO: remove this from the edited set.
+    // TODO: Refresh state from the API
     const newContent =
       document.getElementById(getInputHTMLElementIdByTaskId(id));
 
@@ -159,6 +196,7 @@ class TaskApp extends React.Component {
   }
 
   cancelEditForTask(id) {
+    // TODO: validate this works, no API calls here...
     console.log("in cancelEditForTask with id=" + id);
     let newState = this.deepCopyState(this.state);
     newState.editing.delete(id);
@@ -166,6 +204,7 @@ class TaskApp extends React.Component {
   }
 
   setTaskToEditingMode(id) {
+    // TODO: validate this works, should be with no changes...
     console.log("in setTaskToEditingMode with id=" + id);
     let newState = this.deepCopyState(this.state);
     newState.editing.add(id);
@@ -173,6 +212,8 @@ class TaskApp extends React.Component {
   }
 
   deleteTask(id) {
+    // TODO: make sure ths is not in the edited set (should not be)
+    // API call to delete. Then refresh from API
     console.log("In deleteTask with id=" + id);
     let newState = this.deepCopyState(this.state)
     newState.tasks = this.state.tasks.filter((t) => {return t.id !== id});

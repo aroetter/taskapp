@@ -28,5 +28,9 @@ $ curl -X PUT -d @- -H 'Content-Type: application/json' http://localhost:5001/ta
 
 # Delete
 $ curl -X DELETE http://localhost:5001/task/api/v1/resources/tasks/delete?id=3
+```
 
+## Run the API server
+```
+$ python3 main.py
 ```

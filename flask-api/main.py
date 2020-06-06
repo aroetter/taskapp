@@ -41,14 +41,15 @@ def home():
 
 @app.route(API_ROOT_URL + "/tasks/all", methods=["GET"])
 def api_get_tasks_all():
+
     try:
         tasks = Task.query.order_by(Task.date_created).all()
     except SQLAlchemyError as ex:
         return "DB Error: " + str(ex), HTTP_500_INTERNAL_SERVER_ERROR
     to_return = [task.to_dict() for task in tasks]
-    return jsonify(to_return)
-
-
+    response = jsonify(to_return)
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 @app.route(API_ROOT_URL + "/tasks", methods=["GET"])
